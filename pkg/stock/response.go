@@ -26,13 +26,22 @@ type StockData struct {
 	Volume string `json:"5. volume"`
 }
 
+/*
+ * Metadata.LastRefreshed is in either YYYY-MM-DD HH-II-SS or YYYY-MM-DD format
+ * Use last refreshed's date for key to map[string]StockData
+ */
+func (r Response) LastRefreshedDate() string {
+	dateSlice := strings.Fields(r.Metadata.LastRefreshed)
+	return dateSlice[0]
+}
+
 func (r Response) String() string {
 	if r.Metadata.Symbol == "" {
 		return "No data found for symbol"
 	}
 
 	symbol := strings.ToUpper(r.Metadata.Symbol)
-	stockData := r.Data[r.Metadata.LastRefreshed]
+	stockData := r.Data[r.LastRefreshedDate()]
 	if stockData.Open == "" {
 		return fmt.Sprintf("Error fetching data for %s", symbol)
 	}
